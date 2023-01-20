@@ -1,16 +1,16 @@
 # Nginx LanCache
 
-On premises caching or micro-CDN solution for Microsoft, Google and Adobe products.
+On premises caching or micro-CDN solution for Microsoft, Google, APT Repos. and Adobe products.
 
 ## Overview
 
 The Nginx Lancache is an on premise caching solution initially designed for schools, but its application can be used anywhere.
 
-Using DNS interception for well-known and high-volume domain names at the local level, requested files can be cached on premises.
+## Fork
 
-Running for 12 months on a network of 13,500 users distributed over 33 different independent links, total bandwidth savings netted 160.55 terabytes of data - an average of 13.38 terabytes per month. The caches had an average efficiency ratio of 3.58:1.
+This fork is currently running in an educational environment and will receive updates that may reflect that. 
 
-## Intercepted Zones
+## Supported Zones
 
 Microsoft Zones:
 
@@ -32,6 +32,11 @@ Google Chrome/ChromeOS Zones:
        
        *.gvt1.com
 
+APT [Ubuntu] (Probably supports almost all APT repos, but I only am running Ubuntu so I can not verify. It should be fairly easy to add all of Debian's repos, for example, because they use the same /pool/ structure that Ubuntu is using in their repos) 
+
+      archive.ubuntu.com
+       
+       *.archive.ubuntu.com
 Adobe Zones:
 
        ardownload.adobe.com
@@ -43,7 +48,7 @@ Adobe Zones:
 
 * All zone's need a base '@' A record and a wildcard * record pointing to your on premises cache.
 
-## Implementation Method 1 (Local DNS Option)
+## Implementation Method (Local DNS Option)
 
 This method is for sites with a pre-existing onsite DNS server.
 
@@ -52,16 +57,6 @@ This method is for sites with a pre-existing onsite DNS server.
    for the local DNS interception - eg. 8.8.8.8 / 8.8.4.4.
 3. On your local DNS server, install the zones listed in the "Intercepted Zones" section above with both base and wildcard A records pointing to the IP address you gave your linux VM.
 
-## Implementation Method 2 (Local DHCP Option)
-
-This method is for sites with no onsite DNS server.
-
-1. Create a linux VM (CentOS was used for this variation) with 2GB ram and 100GB disk space, and install Nginx.
-2. Implement the nginx.conf configuration and change the two "forwarders" locations to an upstream DNS server that you WILL NOT use
-   for the local DNS interception - eg. 8.8.8.8 / 8.8.4.4.
-3. Install "bind" and implement the /etc/named.conf and /etc/named/intercept.zone files. Change the DNS forwarders in named.conf to
-   your own forwarders - eg. 8.8.8.8 / 8.8.4.4. Edit the /etc/named/intercept.zone file to point to the IP of your linux vm.
-4. On your local DHCP server, change the DNS server option to point to your linux VM.
 
 ## Design
 
