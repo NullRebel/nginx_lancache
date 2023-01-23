@@ -1,76 +1,52 @@
 # Nginx LanCache
 
-On premises caching or micro-CDN solution for Microsoft, Google, APT Repos. and Adobe products.
+On premises caching for multiple bandwidth-heavy services.
 
 ## Overview
 
-The Nginx Lancache is an on premise caching solution initially designed for schools, but its application can be used anywhere.
-
-## Fork
-
-This fork is currently running in an educational environment and will receive updates that may reflect that. 
-
-## Supported Zones
-
-Microsoft Zones:
-
-       download.windowsupdate.com
-       
-       *.download.windowsupdate.com
-       
-       tlu.dl.delivery.mp.microsoft.com
-       
-       *.tlu.dl.delivery.mp.microsoft.com
-       
-       officecdn.microsoft.com
-       
-       officecdn.microsoft.com.edgesuite.net
-
-Google Chrome/ChromeOS Zones:
-
-       dl.google.com
-       
-       *.gvt1.com
-
-APT [Ubuntu] (Probably supports almost all APT repos, but I only am running Ubuntu so I can not verify. It should be fairly easy to add all of Debian's repos, for example, because they use the same /pool/ structure that Ubuntu is using in their repos) 
-
-      archive.ubuntu.com
-       
-       *.archive.ubuntu.com
-Adobe Zones:
-
-       ardownload.adobe.com
-       
-       ccmdl.adobe.com
-       
-       agsupdate.adobe.com
+The Nginx Lancache is an on premise caching solution initially designed for schools, but its application can be used anywhere. 
 	   
 
 * All zone's need a base '@' A record and a wildcard * record pointing to your on premises cache.
 
-## Implementation Method (Local DNS Option)
+## Implementation using Local DNS
 
 This method is for sites with a pre-existing onsite DNS server.
 
-1. Create a linux VM (CentOS was used for this variation) with 2GB ram and 100GB disk space, and install Nginx.
-2. Implement the nginx.conf configuration and change the two resolver locations to an upstream DNS server that you WILL NOT use
-   for the local DNS interception - eg. 8.8.8.8 / 8.8.4.4.
-3. On your local DNS server, install the zones listed in the "Intercepted Zones" section above with both base and wildcard A records pointing to the IP address you gave your linux VM.
+1. Create a linux VM and install nginx as well as the nginx stream module
+2. Install the nginx.conf and the services directory into /etc/nginx/
+3. On your local DNS server, install the zones listed in the Supported Zones section and point them towards your cache server
 
 
 ## Design
 
-The caches are designed for direct connectivity (no proxy) or transparent proxy.
+Cache only caches HTTP content, and specifically only content that is explicitly set to cached. HTTPS content is passed through automatically using SNI.
+It is important to note that you can technically send any traffic through the proxy but that will obviously cause some performance issues.
 
-Technically you can point any host to the onsite cache, however the more selective the better.
+For example, you could send *.adobe.com through the server, but it would only cache ardownload.adobe.com, ccmdl.adobe.com, and agsupdate.adobe.com and pass through the HTTPS and HTTP traffic for www.adobe.com without performing any caching. 
 
-It only caches HTTP content - SSL is passed through as an SNI proxy only, however the config file has options to rate limit this traffic.
+You really should try to be as specific as possible.
 
-The cache ignores X-Accel-Expires, Expires, Cache-Control, Set-Cookie, and Vary headers. It also ignores query strings as part of
-the cache key.
 
-The cache also downloads large files at one 16MB slice at a time. Cache locking prevents the client from pulling the file at the same
-time as a cache filling operation, thus reducing bandwidth utilisation. In theory, this should mean that only one instance of any file
-is ever downloaded.
+## Supported Zones
 
-Some configuration within the nginx.conf file restricts caching based on a HEAD request. Some updates (for whatever reason) do a HEAD request, then fail to download the actual file. This sometimes causes nginx to download the file into the cache when it is not needed.
+### Microsoft:
+- download.windowsupdate.com
+- *.download.windowsupdate.com
+- tlu.dl.delivery.mp.microsoft.com
+- *.tlu.dl.delivery.mp.microsoft.com
+- officecdn.microsoft.com
+- officecdn.microsoft.com.edgesuite.net
+
+### Google Chrome/ChromeOS Zones:
+- dl.google.com
+- *.gvt1.com
+
+### APT [Ubuntu]
+- archive.ubuntu.com
+- *.archive.ubuntu.com
+
+### Adobe Zones:
+- ardownload.adobe.com
+- ccmdl.adobe.com
+- agsupdate.adobe.com
