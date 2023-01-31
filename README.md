@@ -32,18 +32,22 @@ Google Chrome/ChromeOS Zones:
        
        *.gvt1.com
 
-APT [Ubuntu] (Probably supports almost all APT repos, but I only am running Ubuntu so I can not verify. It should be fairly easy to add all of Debian's repos, for example, because they use the same /pool/ structure that Ubuntu is using in their repos) 
-
-      archive.ubuntu.com
-       
-       *.archive.ubuntu.com
 Adobe Zones:
 
-       ardownload.adobe.com
+       ardownload.adobe.com, agsupdate.adobe.com, ccmdl.adobe.com
        
-       ccmdl.adobe.com
-       
-       agsupdate.adobe.com
+
+APT (Please add to the list and submit a pull request if you find one missing.) 
+
+      *.ubuntu.com
+      
+      *.debian.org
+
+      ppa.launchpad.net, *.ppa.launchpad.net
+
+      repo.steampowered.com, *.repo.steampowered.com
+
+
 	   
 
 * All zone's need a base '@' A record and a wildcard * record pointing to your on premises cache.
